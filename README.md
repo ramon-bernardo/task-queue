@@ -18,3 +18,6 @@ The `Task` struct represents a task that can be executed. It includes the follow
 -> Task will panic in 5 seconds!
 thread '<unnamed>' panicked at src/main.rs:49:13
 ```
+
+## Concept
+This project is based on the concept of the [Dispatcher Thread](https://github.com/otland/forgottenserver/blob/74b61cda4a74186f1920e9dd152c13b953582b47/src/tasks.h#L47-L68) from [The Forgotten Server](https://github.com/otland/forgottenserver), replacing the use of mutex with an [Multi-producer, single-consumer](https://doc.rust-lang.org/std/sync/mpsc/index.html) (lock-free) channel in Rust to optimize message exchange between threads.
