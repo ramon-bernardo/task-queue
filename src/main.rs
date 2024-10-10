@@ -42,10 +42,10 @@ fn main() {
     .join()
     .ok();
 
-    // Send a task that will panic after 5 seconds.
+    // Send a task that will panic.
     sender
         .send(Task::new(Duration::from_secs(5), || {
-            println!("-> Task will panic in 5 seconds!");
+            println!("-> Task panic!");
             panic!();
         }))
         .ok();
@@ -53,10 +53,7 @@ fn main() {
     // Spawn a thread to process tasks from the receiver.
     std::thread::spawn(move || {
         while let Ok(task) = receiver.recv() {
-            // Only run the task if it hasn't expired.
-            if !task.has_expired() {
-                task.run();
-            }
+            task.run();
         }
     })
     .join()
@@ -89,13 +86,16 @@ impl Task {
     }
 
     /// Checks if the task has expired.
-    pub fn has_expired(&self) -> bool {
+    fn has_expired(&self) -> bool {
         self.expires_at
             .map_or(false, |expires_at| expires_at < SystemTime::now())
     }
 
     /// Executes the task.
     pub fn run(self) {
-        (self.func)()
+        // Only run the task if it hasn't expired.
+        if !self.has_expired() {
+            (self.func)()
+        }
     }
 }
